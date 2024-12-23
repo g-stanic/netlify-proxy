@@ -1,0 +1,10 @@
+{
+  "name": "github-proxy-netlify",
+  "version": "1.0.0",
+  "description": "GitHub Proxy Server as Netlify Functions",
+  "dependencies": {
+    "@netlify/functions": "^2.0.0",
+    "@octokit/rest": "^18.12.0",
+    "axios": "^1.7.7"
+  }
+}
