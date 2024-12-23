@@ -1,15 +1,32 @@
 const axios = require('axios');
 
 exports.handler = async function(event, context) {
+  // Define allowed origins
+  const allowedOrigins = [
+    'https://g-stanic.github.io',
+    'http://localhost:3000',
+    'http://127.0.0.1:4000'
+  ];
+  
+  // Get the requesting origin
+  const origin = event.headers.origin;
+  
+  // Check if the origin is allowed
+  const corsHeaders = {
+    'Access-Control-Allow-Methods': 'POST',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  };
+  
+  // Only add Access-Control-Allow-Origin if origin is in allowed list
+  if (allowedOrigins.includes(origin)) {
+    corsHeaders['Access-Control-Allow-Origin'] = origin;
+  }
+
   // Handle CORS preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': 'https://g-stanic.github.io',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      },
+      headers: corsHeaders,
       body: ''
     };
   }
@@ -25,11 +42,7 @@ exports.handler = async function(event, context) {
     if (!code || typeof code !== 'string') {
       return { 
         statusCode: 400,
-        headers: {
-          'Access-Control-Allow-Origin': 'https://g-stanic.github.io',
-          'Access-Control-Allow-Methods': 'POST',
-          'Access-Control-Allow-Headers': 'Content-Type'
-        },
+        headers: corsHeaders,
         body: JSON.stringify({ error: 'Invalid code format' })
       };
     }
@@ -47,22 +60,14 @@ exports.handler = async function(event, context) {
 
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': 'https://g-stanic.github.io',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      },
+      headers: corsHeaders,
       body: JSON.stringify(response.data)
     };
   } catch (error) {
     console.error('Token exchange error:', error.response?.data || error.message);
     return {
       statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': 'https://g-stanic.github.io',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      },
+      headers: corsHeaders,
       body: JSON.stringify({ error: 'Failed to exchange token' })
     };
   }
